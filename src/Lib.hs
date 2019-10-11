@@ -75,10 +75,9 @@ pLetExpr' = do
 readExpr :: FilePath -> IO Expr
 readExpr filePath = do
     txt <- readFile filePath
-    let errOrTax = Indent.runIndentParser parser () filePath txt
-    print errOrTax
-    case errOrTax of
+    let result = Indent.runIndentParser parser () filePath txt
+    case result of
         Left  err -> fail (show err)
-        Right tax -> return tax
+        Right expr -> return expr
   where
     parser = pExpr <* eof
