@@ -7,8 +7,8 @@ import           Text.Parsec.String
 import qualified Text.Parsec.Token       as P
 import qualified Text.Parsec.Indent      as Indent
 
-emptyDef :: P.GenLanguageDef String () (Indent.IndentT Identity)
-emptyDef =
+egisonDef :: P.GenLanguageDef String () (Indent.IndentT Identity)
+egisonDef =
   P.LanguageDef { P.commentStart       = "#|"
                 , P.commentEnd         = "|#"
                 , P.commentLine        = ";"
@@ -22,7 +22,7 @@ emptyDef =
                 , P.caseSensitive      = True }
 
 lexer :: P.GenTokenParser String () (Indent.IndentT Identity)
-lexer = P.makeTokenParser emptyDef
+lexer = P.makeTokenParser egisonDef
 
 reserved :: String -> Indent.IndentParser String () ()
 reserved = P.reserved lexer
