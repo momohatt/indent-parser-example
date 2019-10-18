@@ -53,14 +53,12 @@ pLetExpr :: Parser Expr
 pLetExpr = Indent.withPos $ do
   reserved "let"
   spaces
-  binding <- pLetExpr'
-  spaces
-  bindings' <- many $ Indent.indented *> pLetExpr'
+  bindings <- many $ Indent.indented *> pLetExpr'
   spaces
   reserved "in"
   spaces
   expr <- pExpr
-  return $ LetExpr (binding : bindings') expr
+  return $ LetExpr bindings expr
 
 pLetExpr' :: Parser (String, Expr)
 pLetExpr' = do

@@ -12,5 +12,7 @@ import Megaparsec as M
 
 main :: IO ()
 main = do
-  expr <- I.readExpr "syntax.egi"
-  print expr
+  expr1 <- I.readExpr "syntax.egi"
+  print expr1
+  expr2 <- M.readExpr "syntax.egi"
+  print expr2
