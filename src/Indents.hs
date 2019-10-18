@@ -1,14 +1,18 @@
-module Lib where
+module Indents where
 
 import           Control.Monad.Identity  hiding (mapM)
 import           Control.Applicative     ((*>), (<*), (<|>))
 import           Text.Parsec             hiding ((<|>))
-import           Text.Parsec.String
+import           Text.Parsec.String      hiding (Parser)
 import qualified Text.Parsec.Token       as P
 import qualified Text.Parsec.Indent      as Indent
 
-egisonDef :: P.GenLanguageDef String () (Indent.IndentT Identity)
-egisonDef =
+import           AST
+
+type Parser a = Indent.IndentParser String () a
+
+languageDef :: P.GenLanguageDef String () (Indent.IndentT Identity)
+languageDef =
   P.LanguageDef { P.commentStart       = "{-"
                 , P.commentEnd         = "-}"
                 , P.commentLine        = "--"
@@ -22,35 +26,30 @@ egisonDef =
                 , P.caseSensitive      = True }
 
 lexer :: P.GenTokenParser String () (Indent.IndentT Identity)
-lexer = P.makeTokenParser egisonDef
+lexer = P.makeTokenParser languageDef
 
-reserved :: String -> Indent.IndentParser String () ()
+reserved :: String -> Parser ()
 reserved = P.reserved lexer
 
-reservedOp :: String -> Indent.IndentParser String () ()
+reservedOp :: String -> Parser ()
 reservedOp = P.reservedOp lexer
 
-data Expr
-  = VarExpr String
-  | IntExpr Integer
-  | LetExpr [(String, Expr)] Expr
-  deriving (Show)
-
+pExpr :: Parser Expr
 pExpr = try pLetExpr
     <|> try pIntExpr
     <|> pVar
 
-pVar :: Indent.IndentParser String () Expr
+pVar :: Parser Expr
 pVar = do
   x <- P.identifier lexer
   return $ VarExpr x
 
-pIntExpr :: Indent.IndentParser String () Expr
+pIntExpr :: Parser Expr
 pIntExpr = do
   x <- P.integer lexer
   return $ IntExpr x
 
-pLetExpr :: Indent.IndentParser String () Expr
+pLetExpr :: Parser Expr
 pLetExpr = Indent.withPos $ do
   reserved "let"
   spaces
@@ -63,7 +62,7 @@ pLetExpr = Indent.withPos $ do
   expr <- pExpr
   return $ LetExpr (binding : bindings') expr
 
-pLetExpr' :: Indent.IndentParser String () (String, Expr)
+pLetExpr' :: Parser (String, Expr)
 pLetExpr' = do
   x <- P.identifier lexer
   spaces

@@ -1,6 +1,7 @@
 module Main where
 
-import Lib
+import Indents    as I
+import Megaparsec as M
 
 -- Example:
 -- let x = 1
@@ -11,5 +12,5 @@ import Lib
 
 main :: IO ()
 main = do
-  expr <- readExpr "syntax.egi"
+  expr <- I.readExpr "syntax.egi"
   print expr
