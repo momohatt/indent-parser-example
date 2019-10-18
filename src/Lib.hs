@@ -9,9 +9,9 @@ import qualified Text.Parsec.Indent      as Indent
 
 egisonDef :: P.GenLanguageDef String () (Indent.IndentT Identity)
 egisonDef =
-  P.LanguageDef { P.commentStart       = "#|"
-                , P.commentEnd         = "|#"
-                , P.commentLine        = ";"
+  P.LanguageDef { P.commentStart       = "{-"
+                , P.commentEnd         = "-}"
+                , P.commentLine        = "--"
                 , P.identStart         = letter
                 , P.identLetter        = letter
                 , P.opStart            = oneOf ":!#$%&*+./<=>?@\\^|-~"
