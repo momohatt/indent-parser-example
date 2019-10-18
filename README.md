@@ -4,5 +4,5 @@
 ```
 $ stack init
 $ stack build
-$ stack exec -- indent-exp-exe
+$ stack exec -- indent-parser
 ```
