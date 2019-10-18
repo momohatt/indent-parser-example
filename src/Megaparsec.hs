@@ -33,8 +33,8 @@ parens = between (symbol "(") (symbol ")")
 integer :: Parser Integer
 integer = lexeme L.decimal
 
-rword :: String -> Parser ()
-rword w = (lexeme . try) (string w *> notFollowedBy alphaNumChar)
+reserved :: String -> Parser ()
+reserved w = (lexeme . try) (string w *> notFollowedBy alphaNumChar)
 
 rws :: [String] -- list of reserved words
 rws = ["let", "in"]
@@ -61,9 +61,9 @@ pVar = VarExpr <$> identifier
 pLetExpr :: Parser Expr
 pLetExpr = do
   pos <- L.indentLevel
-  rword "let"
+  reserved "let"
   bindings <- some (L.indentGuard sc GT pos *> pLetExpr')
-  rword "in"
+  reserved "in"
   expr <- pExpr
   return $ LetExpr bindings expr
 
