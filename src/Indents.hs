@@ -1,3 +1,5 @@
+{-# LANGUAGE TupleSections #-}
+
 module Indents where
 
 import           Control.Monad.Identity  hiding (mapM)
@@ -29,45 +31,35 @@ lexer :: P.GenTokenParser String () (Indent.IndentT Identity)
 lexer = P.makeTokenParser languageDef
 
 reserved :: String -> Parser ()
-reserved = P.reserved lexer
+reserved s = P.reserved lexer s <* spaces
 
 reservedOp :: String -> Parser ()
-reservedOp = P.reservedOp lexer
+reservedOp s = P.reservedOp lexer s <* spaces
+
+identifier :: Parser String
+identifier = P.identifier lexer <* spaces
+
+integerLiteral :: Parser Integer
+integerLiteral = P.integer lexer <* spaces
 
 pExpr :: Parser Expr
-pExpr = try pLetExpr
-    <|> try pIntExpr
-    <|> pVar
+pExpr = pLetExpr
+    <|> pAtomExpr
 
-pVar :: Parser Expr
-pVar = do
-  x <- P.identifier lexer
-  return $ VarExpr x
-
-pIntExpr :: Parser Expr
-pIntExpr = do
-  x <- P.integer lexer
-  return $ IntExpr x
+pAtomExpr :: Parser Expr
+pAtomExpr = VarExpr <$> identifier
+        <|> IntExpr <$> integerLiteral
 
 pLetExpr :: Parser Expr
 pLetExpr = Indent.withPos $ do
   reserved "let"
-  spaces
-  bindings <- many $ Indent.indented *> pLetExpr'
-  spaces
+  bindings <- many $ Indent.indented *> pBinding
   reserved "in"
-  spaces
   expr <- pExpr
   return $ LetExpr bindings expr
-
-pLetExpr' :: Parser (String, Expr)
-pLetExpr' = do
-  x <- P.identifier lexer
-  spaces
-  reservedOp "="
-  spaces
-  expr <- pExpr
-  return (x, expr)
+  where
+    pBinding :: Parser (String, Expr)
+    pBinding = (,) <$> identifier <*> (reservedOp "=" >> pExpr)
 
 readExpr :: FilePath -> IO Expr
 readExpr filePath = do
