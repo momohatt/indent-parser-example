@@ -3,8 +3,6 @@
 
 module Megaparsec where
 
-import           Control.Monad (void)
-import           Control.Monad.Combinators.Expr -- from parser-combinators
 import           Data.Void
 import           Text.Megaparsec
 import           Text.Megaparsec.Char
@@ -24,8 +22,8 @@ sc = L.space space1 lineCmnt blockCmnt
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme sc
 
-symbol :: String -> Parser String
-symbol = L.symbol sc
+symbol :: String -> Parser ()
+symbol sym = L.symbol sc sym >> pure ()
 
 parens :: Parser a -> Parser a
 parens = between (symbol "(") (symbol ")")

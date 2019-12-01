@@ -5,7 +5,6 @@ module Indents where
 import           Control.Monad.Identity  hiding (mapM)
 import           Control.Applicative     ((*>), (<*), (<|>))
 import           Text.Parsec             hiding ((<|>))
-import           Text.Parsec.String      hiding (Parser)
 import qualified Text.Parsec.Token       as P
 import qualified Text.Parsec.Indent      as Indent
 
